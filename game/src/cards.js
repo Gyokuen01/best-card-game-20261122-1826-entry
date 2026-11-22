@@ -1,19 +1,23 @@
 // The twelve cards of Lumen Duel. Four aspects (suits): Ember, Tide, Thorn, Lumen.
 // Wardens stay on the table and strike the enemy hero at the end of their owner's turn.
-// Spells resolve at once. All names, art and flavour text are original to this game.
+// Spells resolve at once. All names and flavour text are original to this game;
+// each aspect's art is an original anime illustration in game/assets/.
 export const ASPECTS = {
-  ember: { name: 'Ember', color: '#ff7a3c', soft: 'rgba(255,122,60,.32)', symbol: 'flame' },
-  tide: { name: 'Tide', color: '#3cb8ff', soft: 'rgba(60,184,255,.32)', symbol: 'wave' },
-  thorn: { name: 'Thorn', color: '#7ddb4a', soft: 'rgba(125,219,74,.30)', symbol: 'leaf' },
-  lumen: { name: 'Lumen', color: '#ffd94a', soft: 'rgba(255,217,74,.32)', symbol: 'sun' },
+  ember: { name: 'Ember', color: '#ff7a3c', soft: 'rgba(255,122,60,.32)', art: 'assets/ember.jpg' },
+  tide: { name: 'Tide', color: '#3cb8ff', soft: 'rgba(60,184,255,.32)', art: 'assets/tide.jpg' },
+  thorn: { name: 'Thorn', color: '#7ddb4a', soft: 'rgba(125,219,74,.30)', art: 'assets/thorn.jpg' },
+  lumen: { name: 'Lumen', color: '#ffd94a', soft: 'rgba(255,217,74,.32)', art: 'assets/lumen.jpg' },
 };
 
-// Inline SVG art per aspect symbol (drawn, never borrowed).
-export const SYMBOLS = {
-  flame: '<svg viewBox="0 0 64 64"><path d="M32 6 C40 18 52 24 52 40 A20 20 0 1 1 12 40 C12 30 20 26 24 18 C26 24 30 26 32 26 C30 18 30 12 32 6 Z" fill="#ff7a3c"/><path d="M32 30 C36 36 42 38 42 46 A10 10 0 1 1 22 46 C22 40 28 38 32 30 Z" fill="#ffd94a"/></svg>',
-  wave: '<svg viewBox="0 0 64 64"><path d="M6 26 C16 16 26 36 32 26 C38 16 48 36 58 26 L58 38 C48 48 38 28 32 38 C26 48 16 28 6 38 Z" fill="#3cb8ff"/><path d="M6 42 C16 32 26 52 32 42 C38 32 48 52 58 42 L58 50 C48 58 38 44 32 50 C26 56 16 44 6 50 Z" fill="#7cc4ff"/></svg>',
-  leaf: '<svg viewBox="0 0 64 64"><path d="M50 8 C24 12 10 30 12 52 C34 52 50 36 50 8 Z" fill="#7ddb4a"/><path d="M14 50 C24 38 36 26 48 14" stroke="#2f7a1e" stroke-width="3" fill="none"/><path d="M30 34 C34 30 40 28 46 28" stroke="#2f7a1e" stroke-width="2.5" fill="none"/></svg>',
-  sun: '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="13" fill="#ffd94a"/><g stroke="#ffd94a" stroke-width="4" stroke-linecap="round"><line x1="32" y1="8" x2="32" y2="16"/><line x1="32" y1="48" x2="32" y2="56"/><line x1="8" y1="32" x2="16" y2="32"/><line x1="48" y1="32" x2="56" y2="32"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="43" y1="43" x2="49" y2="49"/><line x1="15" y1="49" x2="21" y2="43"/><line x1="43" y1="21" x2="49" y2="15"/></g></svg>',
+// Resonance: playing two cards of one aspect in a single turn makes that aspect
+// resonate. The bonus fires once per aspect per turn, on the second card played.
+// (The bonus each aspect gives: Ember +2 damage, Tide draw 1, Thorn +3 shield,
+// Lumen +3 HP. The rules engine in game.js applies them.)
+export const RESONANCE = {
+  ember: { name: 'Ember', bonus: 'damage', amount: 2 },
+  tide: { name: 'Tide', bonus: 'draw', amount: 1 },
+  thorn: { name: 'Thorn', bonus: 'shield', amount: 3 },
+  lumen: { name: 'Lumen', bonus: 'heal', amount: 3 },
 };
 
 export const CARDS = [

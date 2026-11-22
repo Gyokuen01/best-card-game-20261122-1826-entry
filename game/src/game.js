@@ -1,7 +1,7 @@
 // Lumen Duel — rules engine (pure logic, no DOM, no timers).
 // Two wardens, 30 HP each. Mana grows by 1 each round (max 10). Wardens stay on the
 // table and strike the enemy hero at the end of their owner's turn. First to 0 HP loses.
-import { CARD_BY_ID, DECK_LIST } from './cards.js';
+import { CARD_BY_ID, DECK_LIST, RESONANCE } from './cards.js';
 import { mulberry32, shuffle } from './rng.js';
 
 export const MAX_HP = 30;
@@ -28,6 +28,11 @@ export function createGame(seed) {
     log: [],
     stats: { damageDealt: 0, damageTaken: 0, cardsPlayed: 0, turnsPlayed: 0 },
     winner: null,
+    // Resonance: aspect -> cards of that aspect played this turn (reset each turn).
+    // fx is the last presentation effect for the view ({ type, aspect, seq }).
+    turnAspects: {},
+    fx: null,
+    fxSeq: 0,
   };
   // Opening hands: 3 cards for the first player, 4 for the second — the classic
   // catch-up card, so going second is not a built-in loss.
@@ -108,6 +113,38 @@ export function canPlay(state, side, handIndex) {
   return true;
 }
 
+/** Resonance: the second card of one aspect in a single turn fires that aspect's
+ * bonus (Ember +2 damage, Tide draw 1, Thorn +3 shield, Lumen +3 HP). Fires once
+ * per aspect per turn, on the second card. Pure: no randomness, so a seeded game
+ * stays deterministic. Returns a resonance event, or null. Also stamps state.fx so
+ * the view can play the combo animation. */
+function resonanceEvent(state, side, card) {
+  const aspect = card.aspect;
+  const count = (state.turnAspects[aspect] ?? 0) + 1;
+  state.turnAspects[aspect] = count;
+  if (count !== 2) return null;
+  const res = RESONANCE[aspect];
+  const who = nameOf(side);
+  const foe = side === 'player' ? 'enemy' : 'player';
+  state.fxSeq += 1;
+  state.fx = { type: 'resonance', aspect, seq: state.fxSeq };
+  if (res.bonus === 'damage') {
+    const dealt = hurtHero(state, foe, res.amount);
+    const soakNote = dealt.soaked > 0 ? ` (${dealt.soaked} soaked by shield)` : '';
+    return { type: 'resonance', side, card: card.id, aspect, text: `<b>${who}</b> — <span class="resonance">${res.name} Resonance!</span> <span class="dmg">+${res.amount} damage</span>${soakNote} to ${side === 'player' ? 'Nyx' : 'you'}.` };
+  }
+  if (res.bonus === 'draw') {
+    drawCard(state, side);
+    return { type: 'resonance', side, card: card.id, aspect, text: `<b>${who}</b> — <span class="resonance">${res.name} Resonance!</span> Draw an extra card.` };
+  }
+  if (res.bonus === 'shield') {
+    heroOf(state, side).shield += res.amount;
+    return { type: 'resonance', side, card: card.id, aspect, text: `<b>${who}</b> — <span class="resonance">${res.name} Resonance!</span> <span class="shield">+${res.amount} shield</span>.` };
+  }
+  const healed = healHero(state, side, res.amount);
+  return { type: 'resonance', side, card: card.id, aspect, text: `<b>${who}</b> — <span class="resonance">${res.name} Resonance!</span> <span class="heal">+${healed} HP</span>.` };
+}
+
 /** Play a card from hand. Returns a list of event descriptions for the log/animation. */
 export function playCard(state, side, handIndex) {
   const hero = heroOf(state, side);
@@ -124,6 +161,8 @@ export function playCard(state, side, handIndex) {
     uidCounter += 1;
     hero.board.push(w);
     events.push({ type: 'summon', side, card: card.id, text: `<b>${who}</b> summon${side === 'player' ? '' : 's'} <b>${card.name}</b> (${card.atk}⚔ / ${card.hp}♥).` });
+    const res = resonanceEvent(state, side, card);
+    if (res) events.push(res);
     return events;
   }
   const e = card.effect;
@@ -153,6 +192,8 @@ export function playCard(state, side, handIndex) {
     for (let i = 0; i < e.draw; i += 1) drawCard(state, side);
     events.push({ type: 'draw', side, card: card.id, text: `<b>${who}</b> draw${side === 'player' ? '' : 's'} ${e.draw} card${e.draw > 1 ? 's' : ''}.` });
   }
+  const res = resonanceEvent(state, side, card);
+  if (res) events.push(res);
   if (events.length === 0) events.push({ type: 'play', side, card: card.id, text: `<b>${who}</b> played <b>${card.name}</b>.` });
   return events;
 }
@@ -171,10 +212,12 @@ export function resolveWardens(state, side) {
   return events;
 }
 
-/** Begin a side's turn: mana refills to the round's level, then draw. */
+/** Begin a side's turn: mana refills to the round's level, then draw. Resonance
+ * counts reset — a new turn is a new chance to resonate. */
 export function startTurn(state, side) {
   const hero = heroOf(state, side);
   if (side === 'player') state.stats.turnsPlayed += 1;
+  state.turnAspects = {};
   hero.maxMana = Math.min(MAX_MANA, state.round);
   hero.mana = hero.maxMana;
   drawCard(state, side);

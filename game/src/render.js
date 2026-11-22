@@ -1,8 +1,15 @@
 // Lumen Duel — DOM rendering. Pure view: reads state, writes the page.
-import { ASPECTS, CARD_BY_ID, SYMBOLS } from './cards.js';
+// Animations here are presentation only: they never touch game state, so the
+// seeded game stays deterministic.
+import { ASPECTS, CARD_BY_ID } from './cards.js';
 import { canPlay } from './game.js';
 
 const $ = (id) => document.getElementById(id);
+
+// The last resonance effect the banner already showed (state.fx.seq counts up).
+// A fresh state object resets the counter, so a new duel re-arms the banner.
+let lastFxState = null;
+let lastFxSeq = 0;
 
 /** A card div. `stats` overrides atk/hp (board wardens carry damage). */
 export function cardElement(card, opts = {}) {
@@ -21,7 +28,7 @@ export function cardElement(card, opts = {}) {
     : `<span class="spell-tag">${aspect.name.toUpperCase()} · SPELL</span>`;
   el.innerHTML = `<div class="cost">${card.cost}</div>`
     + `<div class="aspect-tag">${aspect.name}</div>`
-    + `<div class="art">${SYMBOLS[aspect.symbol]}</div>`
+    + `<div class="art"><img src="${aspect.art}" alt="${aspect.name} art" draggable="false"></div>`
     + `<div class="name">${card.name}</div>`
     + `<div class="kind">${card.kind === 'warden' ? 'Warden' : 'Spell'}</div>`
     + `<div class="text">${card.text}</div>`
@@ -74,7 +81,45 @@ function renderBoard(boardEl, wardens) {
   });
 }
 
+/** Resonance combo FX: a big animated banner in the aspect's colour, a particle
+ * burst and a table flash + shake. Presentation only — driven by state.fx, which
+ * the rules engine stamps when a resonance fires. A new seq re-triggers it. */
+function showResonance(state) {
+  if (state !== lastFxState) { lastFxState = state; lastFxSeq = 0; }
+  if (!state.fx || state.fx.type !== 'resonance' || state.fx.seq === lastFxSeq) return;
+  lastFxSeq = state.fx.seq;
+  const aspect = ASPECTS[state.fx.aspect];
+  const app = $('app');
+  app.style.setProperty('--aspect', aspect.color);
+  app.style.setProperty('--aspect-soft', aspect.soft);
+
+  const banner = $('resonance-banner');
+  banner.textContent = `${aspect.name.toUpperCase()} RESONANCE!`;
+  banner.hidden = false;
+  banner.classList.remove('show');
+  void banner.offsetWidth; // restart the entrance animation
+  banner.classList.add('show');
+
+  // Particle burst: ten fixed-direction sparks (CSS positions, no randomness).
+  const burst = $('resonance-burst');
+  burst.innerHTML = '';
+  for (let i = 0; i < 10; i += 1) {
+    const bit = document.createElement('span');
+    bit.className = `burst-bit b${i}`;
+    burst.appendChild(bit);
+  }
+  burst.classList.remove('go');
+  void burst.offsetWidth;
+  burst.classList.add('go');
+
+  const table = $('table');
+  table.classList.remove('res-flash');
+  void table.offsetWidth;
+  table.classList.add('res-flash');
+}
+
 export function render(state) {
+  showResonance(state);
   renderHero('player', state.player);
   renderHero('enemy', state.enemy);
   $('player-deck-count').textContent = state.player.deck.length;
@@ -121,7 +166,9 @@ export function render(state) {
   if (state.phase === 'win' || state.phase === 'loss') {
     const won = state.phase === 'win';
     end.querySelector('.end-card').classList.toggle('defeat', !won);
-    $('end-emblem').textContent = won ? '✦' : '◈';
+    $('end-emblem').innerHTML = won
+      ? '<img src="./assets/dawn-warden.jpg" alt="Dawn Warden, victorious">'
+      : '<img src="./assets/nyx.jpg" alt="Nyx, the Hollow Warden">';
     $('end-title').textContent = won ? 'VICTORY' : 'DEFEAT';
     $('end-sub').textContent = won
       ? 'Nyx fades into the dusk. The light prevails.'

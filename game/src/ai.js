@@ -27,6 +27,14 @@ function scoreCard(state, side, handIndex) {
   if (e.shield) score += e.shield * (foe.board.length > 0 ? 1.0 : 0.4);
   if (e.draw) score += 1.6;
   if (e.mana) score += 1.2;
+  // Resonance: this card is the second of its aspect this turn, so it fires the
+  // aspect's bonus on top of its own effect — worth chasing.
+  const played = state.turnAspects ?? {};
+  if ((played[card.aspect] ?? 0) === 1) {
+    score += card.aspect === 'ember' ? 2.6
+      : card.aspect === 'tide' ? 1.6
+      : card.aspect === 'thorn' ? 2.4 : 2.2;
+  }
   return score - card.cost * 0.2;
 }
 

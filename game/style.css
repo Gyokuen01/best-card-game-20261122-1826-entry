@@ -1,4 +1,5 @@
-/* Lumen Duel — table, cards, overlays. All art is CSS + inline SVG; no network assets. */
+/* Lumen Duel — table, cards, overlays. Card and hero art are local anime images
+   (game/assets/); the rest is CSS. No network assets. */
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; overflow: hidden; }
 body {
@@ -40,11 +41,12 @@ body {
 .hero { display: flex; align-items: center; gap: 12px; }
 .avatar {
   width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex: none; border: 2px solid rgba(255,255,255,.35);
+  flex: none; border: 2px solid rgba(255,255,255,.35); overflow: hidden; padding: 0;
   box-shadow: 0 0 18px rgba(0,0,0,.5), inset 0 0 12px rgba(255,255,255,.25);
 }
-.avatar-you { background: radial-gradient(circle at 35% 30%, #ffe98a, #f5a623 55%, #8a4b00); color: #3a2500; }
-.avatar-nyx { background: radial-gradient(circle at 35% 30%, #c9b8ff, #6a4fd0 55%, #1c1040); color: #efe9ff; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center 18%; display: block; }
+.avatar-you { background: radial-gradient(circle at 35% 30%, #ffe98a, #f5a623 55%, #8a4b00); }
+.avatar-nyx { background: radial-gradient(circle at 35% 30%, #c9b8ff, #6a4fd0 55%, #1c1040); }
 .hero-info { flex: 1; min-width: 0; }
 .hero-name { font-family: Georgia, serif; font-weight: 700; font-size: 16px; letter-spacing: .06em; }
 .hero-title { font-weight: 400; font-size: 12px; color: #b9aee0; letter-spacing: .02em; }
@@ -115,9 +117,9 @@ body {
   height: 56px; flex: none; display: flex; align-items: center; justify-content: center;
   background: radial-gradient(circle at 50% 120%, var(--aspect-soft, rgba(138,123,216,.35)), transparent 70%),
     linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.25));
-  border-bottom: 1px solid rgba(255,255,255,.14);
+  border-bottom: 1px solid rgba(255,255,255,.14); overflow: hidden;
 }
-.card .art svg { width: 40px; height: 40px; filter: drop-shadow(0 0 10px var(--aspect, #8a7bd8)); }
+.card .art img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; }
 .card .name {
   font-family: Georgia, serif; font-weight: 700; font-size: 13.5px; text-align: center;
   padding: 6px 6px 0; line-height: 1.1; color: #fff;
@@ -135,7 +137,6 @@ body {
 /* board (in-play) wardens are smaller */
 .board .card { width: 88px; height: 122px; }
 .board .card .art { height: 46px; }
-.board .card .art svg { width: 32px; height: 32px; }
 .board .card .name { font-size: 12px; }
 .board .card .text { display: none; }
 .board .card.playable { cursor: default; box-shadow: 0 6px 16px rgba(0,0,0,.55); }
@@ -150,6 +151,7 @@ body {
 }
 .log b { color: #ffe98a; }
 .log .dmg { color: #ff9a8a; } .log .heal { color: #8be9a8; } .log .shield { color: #8ecfff; }
+.log .resonance { color: #ffd94a; font-weight: 800; }
 .mid-controls { display: flex; flex-direction: column; align-items: center; gap: 5px; }
 .round-label { font-size: 12px; font-weight: 700; letter-spacing: .14em; color: #b9aee0; }
 .end-turn-btn {
@@ -180,6 +182,10 @@ body {
 .orb-b { width: 150px; height: 150px; background: #ff7a3c; bottom: -60px; right: -30px; }
 .orb-c { width: 110px; height: 110px; background: #3cb8ff; top: 40%; right: -40px; }
 .title-kicker { position: relative; font-size: 12px; letter-spacing: .42em; color: #c9b8ff; font-weight: 700; }
+.title-heroes { position: relative; display: flex; align-items: center; justify-content: center; gap: 16px; margin: 14px 0 2px; }
+.title-hero { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; object-position: center 18%; border: 3px solid rgba(255,217,74,.65); box-shadow: 0 0 24px rgba(255,217,74,.35); }
+.title-hero-nyx { border-color: rgba(201,184,255,.65); box-shadow: 0 0 24px rgba(106,79,208,.45); }
+.title-vs { font-family: Georgia, serif; font-weight: 900; font-size: 20px; color: #ffd94a; text-shadow: 0 0 12px rgba(255,217,74,.6); }
 .title-main {
   position: relative; margin: 10px 0 6px; font-family: Georgia, serif; font-size: 76px; line-height: .95;
   font-weight: 900; letter-spacing: .04em; color: #ffe98a;
@@ -201,6 +207,8 @@ body {
 .title-foot { position: relative; margin-top: 18px; font-size: 11px; color: rgba(255,255,255,.45); letter-spacing: .06em; }
 .end-card { text-align: center; max-width: 560px; padding: 36px 48px 30px; background: linear-gradient(180deg, rgba(38,28,86,.92), rgba(18,13,44,.94)); border: 1px solid rgba(255,217,74,.45); border-radius: 20px; box-shadow: 0 0 60px rgba(124,92,255,.35), 0 24px 60px rgba(0,0,0,.6); }
 .end-emblem { font-size: 58px; line-height: 1; }
+.end-emblem img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; object-position: center 18%; border: 3px solid rgba(255,217,74,.6); box-shadow: 0 0 28px rgba(255,217,74,.45); }
+.end-card.defeat .end-emblem img { border-color: rgba(255,92,122,.6); box-shadow: 0 0 28px rgba(255,92,122,.45); }
 .end-title { font-family: Georgia, serif; font-size: 58px; margin: 10px 0 4px; letter-spacing: .06em; color: #ffe98a; text-shadow: 0 0 28px rgba(255,217,74,.6); }
 .end-card.defeat .end-title { color: #ff8a9a; text-shadow: 0 0 28px rgba(255,92,122,.6); }
 .end-sub { font-size: 15px; color: #ddd6f5; margin: 0 0 16px; }
@@ -209,3 +217,57 @@ body {
 .end-stat b { display: block; font-size: 20px; color: #fff; }
 .flash { animation: flash .5s ease; }
 @keyframes flash { 0% { filter: brightness(1.9); } 100% { filter: brightness(1); } }
+
+/* ---------- Resonance combo FX (presentation only) ---------- */
+.resonance-banner {
+  position: absolute; top: 36%; left: 50%; z-index: 6; pointer-events: none;
+  transform: translate(-50%, -50%);
+  font-family: Georgia, serif; font-weight: 900; font-size: 34px; letter-spacing: .08em;
+  color: #fff; text-shadow: 0 0 18px var(--aspect, #ffd94a), 0 2px 0 rgba(0,0,0,.5);
+  padding: 10px 26px; border-radius: 14px; white-space: nowrap;
+  background: rgba(0,0,0,.45); border: 2px solid var(--aspect, #ffd94a);
+  box-shadow: 0 0 34px var(--aspect-soft, rgba(255,217,74,.4)), inset 0 0 22px rgba(0,0,0,.35);
+  opacity: 0; visibility: hidden;
+}
+.resonance-banner.show { visibility: visible; animation: resBanner 2.4s ease forwards; }
+@keyframes resBanner {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.55); }
+  12% { opacity: 1; transform: translate(-50%, -50%) scale(1.14); }
+  20% { transform: translate(-50%, -50%) scale(1); }
+  78% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -58%) scale(1.02); }
+}
+.resonance-burst { position: absolute; top: 36%; left: 50%; width: 0; height: 0; z-index: 5; pointer-events: none; }
+.resonance-burst .burst-bit {
+  position: absolute; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--aspect, #ffd94a); box-shadow: 0 0 12px var(--aspect, #ffd94a);
+  opacity: 0;
+}
+.resonance-burst.go .burst-bit { animation: resBurst .9s ease-out forwards; }
+.burst-bit.b0 { --dx: -95px; --dy: -75px; }
+.burst-bit.b1 { --dx: -30px; --dy: -105px; }
+.burst-bit.b2 { --dx: 45px; --dy: -95px; }
+.burst-bit.b3 { --dx: 100px; --dy: -55px; }
+.burst-bit.b4 { --dx: -110px; --dy: -10px; }
+.burst-bit.b5 { --dx: 115px; --dy: 5px; }
+.burst-bit.b6 { --dx: -80px; --dy: 60px; }
+.burst-bit.b7 { --dx: -15px; --dy: 95px; }
+.burst-bit.b8 { --dx: 55px; --dy: 80px; }
+.burst-bit.b9 { --dx: 105px; --dy: 55px; }
+@keyframes resBurst {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.2); }
+}
+#table.res-flash { animation: resFlash .9s ease, resShake .45s ease; }
+@keyframes resFlash {
+  0% { box-shadow: inset 0 0 0 rgba(0,0,0,0); }
+  25% { box-shadow: inset 0 0 70px var(--aspect-soft, rgba(255,217,74,.4)); }
+  100% { box-shadow: inset 0 0 0 rgba(0,0,0,0); }
+}
+@keyframes resShake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-3px, 1px); }
+  40% { transform: translate(3px, -1px); }
+  60% { transform: translate(-2px, 0); }
+  80% { transform: translate(2px, 1px); }
+}

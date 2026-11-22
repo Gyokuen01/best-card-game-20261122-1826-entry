@@ -22,7 +22,7 @@
     <!-- Opponent -->
     <section id="enemy-zone" class="zone">
       <div class="hero" id="enemy-hero">
-        <div class="avatar avatar-nyx" aria-label="Nyx, the Hollow Warden">◈</div>
+        <div class="avatar avatar-nyx" aria-label="Nyx, the Hollow Warden"><img src="./assets/nyx.jpg" alt="Nyx"></div>
         <div class="hero-info">
           <div class="hero-name">NYX <span class="hero-title">· the Hollow Warden</span></div>
           <div class="hp-row">
@@ -53,7 +53,7 @@
       <div id="player-board" class="board" aria-label="Your wardens"></div>
       <div id="player-hand" class="hand" aria-label="Your hand"></div>
       <div class="hero" id="player-hero">
-        <div class="avatar avatar-you" aria-label="You, the Dawn Warden">✦</div>
+        <div class="avatar avatar-you" aria-label="You, the Dawn Warden"><img src="./assets/dawn-warden.jpg" alt="Dawn Warden"></div>
         <div class="hero-info">
           <div class="hero-name">YOU <span class="hero-title">· the Dawn Warden</span></div>
           <div class="hp-row">
@@ -66,11 +66,20 @@
     </section>
   </div>
 
+  <!-- Resonance combo FX (banner + particle burst), driven by render.js -->
+  <div id="resonance-banner" class="resonance-banner" hidden></div>
+  <div id="resonance-burst" class="resonance-burst" aria-hidden="true"></div>
+
   <!-- Title overlay -->
   <div id="screen-title" class="overlay">
     <div class="title-card">
       <div class="title-orb orb-a"></div><div class="title-orb orb-b"></div><div class="title-orb orb-c"></div>
       <div class="title-kicker">A DUEL OF WOVEN LIGHT</div>
+      <div class="title-heroes">
+        <img class="title-hero" src="./assets/dawn-warden.jpg" alt="Dawn Warden, hero of light">
+        <div class="title-vs">VS</div>
+        <img class="title-hero title-hero-nyx" src="./assets/nyx.jpg" alt="Nyx, the Hollow Warden">
+      </div>
       <h1 class="title-main">LUMEN<br>DUEL</h1>
       <p class="title-sub">Two wardens. Thirty lights each. One dawn left standing.</p>
       <button id="btn-play" class="play-btn">⚔ &nbsp;Begin the Duel</button>
@@ -79,6 +88,7 @@
         <div><b>Mana</b> — grows by 1 each round (max 10). Cards cost mana to play.</div>
         <div><b>Wardens</b> — creatures stay on the table and strike the enemy at the end of your turn.</div>
         <div><b>Spells</b> — instant effects: damage, heal, shield, draw, and more.</div>
+        <div><b>Resonance</b> — play 2 cards of one aspect in a turn and it resonates: Ember +2 damage, Tide draw 1, Thorn +3 shield, Lumen +3 HP. Nyx can resonate too.</div>
       </div>
       <div class="title-foot">An original game · art, names and sounds woven for this duel</div>
     </div>

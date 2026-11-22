@@ -5,10 +5,11 @@
 **Lumen Duel** is an original 1v1 card battler: you are the Dawn Warden, duelling Nyx, the Hollow Warden, for the last light of the day. Both wardens have 30 HP. Mana grows by 1 each round (max 10). Play warden cards — they stay on the table and strike the enemy at the end of your turn — and spell cards for damage, healing, shield, card draw, and extra mana. Reduce Nyx to 0 HP before she does the same to you.
 
 - 12 original cards across four aspects: Ember, Tide, Thorn, Lumen
-- A real AI opponent (greedy heuristic: lethal checks, healing, board control)
+- **Resonance combos** — play 2 cards of one aspect in a turn and it resonates: Ember +2 damage, Tide draw 1, Thorn +3 shield, Lumen +3 HP, with an animated combo banner, particle burst and table flash in the aspect's colour. Nyx resonates too.
+- A real AI opponent (greedy heuristic: lethal checks, healing, board control, resonance chase)
 - Title screen, live table with both hands and life totals, win and loss screens
 - Keyboard + mouse: click cards to play, keys 1–5, Space to end turn, M to mute, R to restart
-- Synthesized sound effects (WebAudio, no audio files); all art is CSS + inline SVG
+- Synthesized sound effects (WebAudio, no audio files); card and hero art are original anime illustrations in `game/assets/`
 
 ## Run it
 
